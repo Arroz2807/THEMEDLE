@@ -1,0 +1,72 @@
+# ===================================================
+# .gitignore para proyectos Unity
+# Carpetas generadas automáticamente — no tienen que
+# subir al repo porque Unity las regenera solas
+# ===================================================
+
+# Carpeta de caché interna de Unity (se regenera al abrir el proyecto)
+[Ll]ibrary/
+
+# Archivos temporales que Unity genera mientras corre
+[Tt]emp/
+
+# Carpeta de compilación del juego
+[Bb]uild/
+[Bb]uilds/
+
+# Logs de Unity Editor y Player
+[Ll]ogs/
+
+# Carpeta de configuración personal del usuario (no compartir)
+[Uu]ser[Ss]ettings/
+
+# Archivos de Visual Studio y Rider
+.vs/
+*.csproj
+*.sln
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+
+# Archivos de JetBrains Rider
+.idea/
+*.iml
+
+# Crashes y dumps
+crashlytics-build.properties
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.json
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.hash
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Carpetas de plugins que se pueden regenerar
+[Oo]bj/
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
