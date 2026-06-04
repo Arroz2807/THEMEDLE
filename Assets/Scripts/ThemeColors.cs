@@ -11,7 +11,7 @@ public static class ThemeColors
     public static readonly Color Present = new Color(0.824f, 0.718f, 0.224f);
 
     // Gris oscuro: letra no está en la palabra
-    public static readonly Color Absent = new Color(0.380f, 0.380f, 0.388f);
+    public static readonly Color Absent = new Color(0.341f, 0.341f, 0.341f);
 
     // Gris muy oscuro: tile vacío sin evaluar
     public static readonly Color Empty = new Color(0.220f, 0.220f, 0.227f);

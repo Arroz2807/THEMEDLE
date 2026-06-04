@@ -188,13 +188,14 @@ public class Keyboard_Controller : MonoBehaviour
     }
 
     // Devuelve la prioridad numérica de un TileResult
-    // Correct=2, Present=1, Absent=0
+    // Correct=3, Present=2, Absent=1
     private int GetResultPriority(TileResult result)
     {
         switch (result)
         {
-            case TileResult.Correct: return 2;
-            case TileResult.Present: return 1;
+            case TileResult.Correct: return 3;
+            case TileResult.Present: return 2;
+            case TileResult.Absent: return 1;
             default: return 0;
         }
     }
@@ -204,9 +205,10 @@ public class Keyboard_Controller : MonoBehaviour
     private int GetColorPriority(Color color)
     {
         // Comparamos con los colores de ThemeColors con una tolerancia pequeña
-        if (ColorsMatch(color, ThemeColors.Correct)) return 2; // ya es verde
-        if (ColorsMatch(color, ThemeColors.Present)) return 1; // ya es amarillo
-        return 0; // es gris, default, o nunca fue evaluada
+        if (ColorsMatch(color, ThemeColors.Correct)) return 3; // ya es verde
+        if (ColorsMatch(color, ThemeColors.Present)) return 2; // ya es amarillo
+        if (ColorsMatch(color, ThemeColors.Absent)) return 1; // ya es gris
+        return 0; // key default, o nunca fue evaluada
     }
 
     // Compara dos colores con una tolerancia para evitar problemas de precisión float
