@@ -1,72 +1,62 @@
-# ===================================================
-# .gitignore para proyectos Unity
-# Carpetas generadas automáticamente — no tienen que
-# subir al repo porque Unity las regenera solas
-# ===================================================
+# ── UNITY ────────────────────────────────────────────────────────────────────
 
-# Carpeta de caché interna de Unity (se regenera al abrir el proyecto)
+# Carpetas generadas por Unity que no deben subirse
 [Ll]ibrary/
-
-# Archivos temporales que Unity genera mientras corre
 [Tt]emp/
-
-# Carpeta de compilación del juego
+[Oo]bj/
 [Bb]uild/
 [Bb]uilds/
-
-# Logs de Unity Editor y Player
 [Ll]ogs/
-
-# Carpeta de configuración personal del usuario (no compartir)
 [Uu]ser[Ss]ettings/
 
-# Archivos de Visual Studio y Rider
+# Archivos de caché de Asset Database
+Assets/AssetStoreTools*
+
+# Archivos autogenerados de TextMeshPro
+Assets/TextMesh Pro/
+
+# ── VISUAL STUDIO ─────────────────────────────────────────────────────────────
+
 .vs/
 *.csproj
 *.sln
-*.pidb
-*.booproj
-*.svd
-*.pdb
-*.opendb
-*.VC.db
-ExportedObj/
-.consulo/
-*.csproj
-*.unityproj
-*.sln
 *.suo
-*.tmp
 *.user
-*.userprefs
+*.userosscache
+*.sln.docstates
 *.pidb
 *.booproj
-*.svd
-*.pdb
 
-# Archivos de JetBrains Rider
-.idea/
-*.iml
+# Pero SÍ subimos el .sln principal del proyecto Unity
+!THEMEDLE_v2.sln
 
-# Crashes y dumps
-crashlytics-build.properties
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.json
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.hash
+# ── EJECUTABLES Y BUILDS ──────────────────────────────────────────────────────
+
+# La carpeta EXE donde pusiste el build no debe subirse
+EXE/
+*.exe
+*.apk
+*.aab
+
+# ── SISTEMA OPERATIVO ─────────────────────────────────────────────────────────
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
 
-# Windows
-Thumbs.db
-Desktop.ini
+# ── OTROS ─────────────────────────────────────────────────────────────────────
 
-# Linux
-*~
+# JetBrains Rider
+.idea/
 
-# Carpetas de plugins que se pueden regenerar
-[Oo]bj/
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
+# VS Code
+.vscode/
+
+# Crashlytics
+crashlytics-build.properties
