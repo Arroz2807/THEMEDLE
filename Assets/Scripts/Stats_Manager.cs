@@ -4,12 +4,12 @@ public class Stats_Manager : MonoBehaviour
 {
     public static Stats_Manager Instance;
 
-    // Propiedades de solo lectura accesibles desde cualquier script
+    
     public int PartidasJugadas { get; private set; }
     public int PartidasGanadas { get; private set; }
     public int PorcentajeVictoria { get; private set; }
 
-    // Claves para PlayerPrefs
+    
     private const string KEY_JUGADAS = "stats_jugadas";
     private const string KEY_GANADAS = "stats_ganadas";
 
@@ -19,7 +19,7 @@ public class Stats_Manager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Cargamos las estadísticas guardadas
+        
         LoadStats();
     }
 
@@ -30,8 +30,7 @@ public class Stats_Manager : MonoBehaviour
         CalcularPorcentaje();
     }
 
-    // Llamado por Game_Manager cuando termina una partida
-    // won = true si ganó, false si perdió
+    
     public void RegisterResult(bool won)
     {
         PartidasJugadas++;
@@ -41,12 +40,11 @@ public class Stats_Manager : MonoBehaviour
         SaveStats();
     }
 
-    // Calcula el porcentaje como entero (ej: 75)
+    
     private void CalcularPorcentaje()
     {
         PorcentajeVictoria = PartidasJugadas > 0
-            ? Mathf.RoundToInt((float)PartidasGanadas / PartidasJugadas * 100)
-            : 0;
+            ? Mathf.RoundToInt((float)PartidasGanadas / PartidasJugadas * 100) : 0;
     }
 
     private void SaveStats()

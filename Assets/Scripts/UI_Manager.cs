@@ -5,7 +5,6 @@ using System.Collections;
 
 public class UI_Manager : MonoBehaviour
 {
-    // ── Paneles ──────────────────────────────────────────────────────────
     [Header("Paneles")]
     public GameObject panelMenu;
     public GameObject panelSelectionMenu;
@@ -15,41 +14,33 @@ public class UI_Manager : MonoBehaviour
     public GameObject panelGame;
     public GameObject panelResult;
 
-    // ── Panel_SelectionMenu ────────────────────────────────────────────────────────
     [Header("Panel SelectionMenu")]
     public TMP_Dropdown dropdownCategoria;
     public TMP_Dropdown dropdownDificultad;
 
-    // ── Panel_Game ────────────────────────────────────────────────────────
     [Header("Panel Game")]
     public TMP_Text txtCategory;
     public TMP_Text txtErrorMessage;
 
-    // ── Panel_Stats ───────────────────────────────────────────────────────
     [Header("Panel Stats")]
     public TMP_Text txtPartidasJugadas;
     public TMP_Text txtPartidasGanadas;
     public TMP_Text txtPorcentaje;
-    // Tiempo en segundos que se muestra Stats antes de avanzar a Result
+
     public float statsDisplayTime = 3f;
 
-    // ── Panel_Result ──────────────────────────────────────────────────────
     [Header("Panel Result")]
-    public TMP_Text txtResultStatus;    // "¡CORRECTO!" o "INCORRECTO"
-    public TMP_Text txtResultWord;      // "La palabra era: TIGRE" (siempre visible)
-    public TMP_Text txtResultAttempts;  // "La adivinaste en X intentos" o "Usaste 6 intentos"
+    public TMP_Text txtResultStatus;
+    public TMP_Text txtResultWord;
+    public TMP_Text txtResultAttempts;
 
-    // ── Panel_Settings ────────────────────────────────────────────────────
     [Header("Panel Settings")]
     public Slider sliderVolumen;
-    public TMP_Dropdown dropdownTema;   // reemplaza el Toggle
+    public TMP_Dropdown dropdownTema;
     public TMP_Dropdown dropdownIdioma;
-
-    // ─────────────────────────────────────────────────────────────────────
 
     void Start()
     {
-        // Al iniciar la escena, mostramos solo el menú principal
         UpdateUI(GameState.Menu);
     }
 
@@ -73,6 +64,7 @@ public class UI_Manager : MonoBehaviour
 
             case GameState.Settings:
                 panelSettings.SetActive(true);
+                StartCoroutine(SyncVolumeSliderNextFrame());
                 break;
 
             case GameState.Playing:
@@ -80,15 +72,15 @@ public class UI_Manager : MonoBehaviour
                 break;
 
             case GameState.Stats:
-                // Actualizamos los textos y mostramos el panel
+
                 RefreshStatsPanel();
                 panelStats.SetActive(true);
-                // Arrancamos el timer para avanzar a Result
+
                 StartCoroutine(WaitAndShowResult());
                 break;
 
             case GameState.Result:
-                // Mostramos solo el panel de resultado, sin el juego de fondo
+
                 RefreshResultPanel();
                 panelResult.SetActive(true);
                 break;
@@ -99,24 +91,41 @@ public class UI_Manager : MonoBehaviour
     {
         StopAllCoroutines();
 
-        // Verificamos que cada referencia no sea null antes de desactivar
         if (panelMenu) panelMenu.SetActive(false);
         if (panelSelectionMenu) panelSelectionMenu.SetActive(false);
         if (panelHowToPlay) panelHowToPlay.SetActive(false);
-        if (panelSettings) panelSettings.SetActive(false);
+        if (panelSettings)
+        {
+            if (Settings_Manager.Instance != null)
+                Settings_Manager.Instance.SetIgnorarCambiosVolumen(true);
+            panelSettings.SetActive(false);
+        }
         if (panelStats) panelStats.SetActive(false);
         if (panelGame) panelGame.SetActive(false);
         if (panelResult) panelResult.SetActive(false);
     }
 
-    // Timer: después de statsDisplayTime segundos, avanza a Result
     private IEnumerator WaitAndShowResult()
     {
         yield return new WaitForSeconds(statsDisplayTime);
         Game_Manager.Instance.ProceedToResult();
     }
 
-    // Actualiza los textos de Panel_Stats con los datos reales
+    private IEnumerator SyncVolumeSliderNextFrame()
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (sliderVolumen != null && Settings_Manager.Instance != null)
+        {
+            Debug.Log($"[DIAGNOSTICO] SyncVolumeSliderNextFrame: aplicando {Settings_Manager.Instance.Volumen} al slider. Valor actual del slider antes = {sliderVolumen.value}");
+            sliderVolumen.SetValueWithoutNotify(Settings_Manager.Instance.Volumen);
+            Debug.Log($"[DIAGNOSTICO] SyncVolumeSliderNextFrame: valor del slider despues = {sliderVolumen.value}");
+        }
+
+        if (Settings_Manager.Instance != null)
+            Settings_Manager.Instance.SetIgnorarCambiosVolumen(false);
+    }
+
     private void RefreshStatsPanel()
     {
         Stats_Manager sm = Stats_Manager.Instance;
@@ -125,7 +134,6 @@ public class UI_Manager : MonoBehaviour
         txtPorcentaje.text = "Porcentaje de Victoria: " + sm.PorcentajeVictoria + "%";
     }
 
-    // Arma Panel_Result según si ganó o perdió
     private void RefreshResultPanel()
     {
         Game_Manager gm = Game_Manager.Instance;
@@ -133,18 +141,15 @@ public class UI_Manager : MonoBehaviour
         int attempts = gm.LastAttemptsUsed;
         string word = gm.LastSecretWord;
 
-        // Estado: siempre muestra la palabra correcta
         txtResultStatus.text = won ? "¡CORRECTO!" : "¡INCORRECTO!";
         txtResultWord.text = "La palabra era: " + word.ToUpper();
 
-        // Intentos: mensaje diferente según resultado
         if (won)
             txtResultAttempts.text = "La adivinaste en " + attempts + " intento(s)";
         else
             txtResultAttempts.text = "Usaste los " + attempts + " intentos";
     }
 
-    // Muestra un error temporario en Panel_Game
     public void ShowError(string message)
     {
         txtErrorMessage.text = message;
@@ -163,8 +168,6 @@ public class UI_Manager : MonoBehaviour
     {
         txtCategory.text = "Categoría: " + category.ToUpper();
     }
-
-    // ── BOTONES ───────────────────────────────────────────────────────────
 
     public void OnBtn_Play()
         => Game_Manager.Instance.ChangeState(GameState.SelectionMenu);
@@ -193,18 +196,14 @@ public class UI_Manager : MonoBehaviour
     public void OnBtn_Close()
         => Application.Quit();
 
-    // En Panel_SelectionMenu: el botón Comenzar llama a este método
     public void OnBtn_StartGame()
     {
-        // Leemos la categoría del dropdown (0=Animales, 1=Paises, 2=Comidas)
         string[] categorias = { "Animales", "Paises", "Comidas" };
         string categoria = categorias[dropdownCategoria.value];
 
-        // Leemos la dificultad (0=Fácil, 1=Medio, 2=Difícil)
         string[] dificultades = { "Facil", "Medio", "Dificil" };
         string dificultad = dificultades[dropdownDificultad.value];
 
-        // Iniciamos el juego con esos parámetros
         Game_Manager.Instance.StartGame(categoria, dificultad);
     }
 }

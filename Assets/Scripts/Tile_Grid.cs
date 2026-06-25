@@ -4,34 +4,29 @@ using System.Collections;
 
 public class Tile_Grid : MonoBehaviour
 {
-    // ── CONFIGURACIÓN DE LA GRILLA ────────────────────────────────────────
 
     [Header("Configuración")]
-    public int maxAttempts = 6; // filas: cuántos intentos tiene el jugador
+    public int maxAttempts = 6; 
 
     [Header("Prefab y contenedor")]
-    public GameObject tilePrefab;   // el prefab de un tile individual
-    public Transform gridContainer; // el TileGrid_Container de la escena
+    public GameObject tilePrefab;   
+    public Transform gridContainer; 
 
-    // ── ESTADO INTERNO ────────────────────────────────────────────────────
 
-    // Referencia al Grid Layout Group del contenedor
+
     private GridLayoutGroup gridLayoutGroup;
 
-    // Grilla 2D de tiles: [fila][columna]
+
     private Tile[,] tiles;
 
-    // Fila actual (intento en curso), columna actual (posición de la letra)
+
     private int currentRow = 0;
     private int currentColumn = 0;
 
-    // Largo de la palabra actual (se calcula al iniciar cada partida)
-    private int wordLength = 5;
+    private int wordLength;
+    private string secretWord;
 
-    // La palabra secreta que el jugador tiene que adivinar
-    private string secretWord = "";
 
-    // ── AWAKE ─────────────────────────────────────────────────────────────
 
     void Awake()
     {
@@ -41,16 +36,12 @@ public class Tile_Grid : MonoBehaviour
             return;
         }
 
-        // Buscamos o creamos el Grid Layout Group en el contenedor
         gridLayoutGroup = gridContainer.GetComponent<GridLayoutGroup>();
         if (gridLayoutGroup == null)
             gridLayoutGroup = gridContainer.gameObject.AddComponent<GridLayoutGroup>();
     }
 
-    // ── INICIALIZACIÓN ────────────────────────────────────────────────────
 
-    // Crea la grilla de tiles en la escena
-    // Se llama desde Game_Manager cuando empieza una partida
     public void BuildGrid(string word)
     {
         if (gridContainer == null)
@@ -64,32 +55,30 @@ public class Tile_Grid : MonoBehaviour
             return;
         }
 
-        // Limpiamos cualquier tile que pudiera haber de una partida anterior
+
         foreach (Transform child in gridContainer)
             Destroy(child.gameObject);
 
-        // Guardamos la palabra secreta y su largo
+
         secretWord = word.ToUpper();
         wordLength = secretWord.Length;
         currentRow = 0;
         currentColumn = 0;
 
-        // Configuramos el Grid Layout Group con tamaño fijo
         ConfigureGridLayout(wordLength);
 
-        // Inicializamos el array 2D
+
         tiles = new Tile[maxAttempts, wordLength];
 
-        // Creamos los tiles fila por fila, columna por columna
         for (int row = 0; row < maxAttempts; row++)
         {
             for (int col = 0; col < wordLength; col++)
             {
-                // Instanciamos el prefab dentro del contenedor
+
                 GameObject tileGO = Instantiate(tilePrefab, gridContainer);
                 tileGO.name = $"Tile_{row}_{col}";
 
-                // Verificamos que el prefab tenga el componente Tile
+
                 Tile t = tileGO.GetComponent<Tile>();
                 if (t == null)
                 {
@@ -97,20 +86,17 @@ public class Tile_Grid : MonoBehaviour
                     return;
                 }
 
-                // Guardamos la referencia en la grilla 2D
+
                 tiles[row, col] = t;
 
-                // Lo reseteamos a su estado inicial
                 tiles[row, col].Reset();
             }
         }
     }
 
-    // Tamaño fijo para todos los niveles de dificultad
-    // El jugador siempre ve tiles del mismo tamaño
+
     private void ConfigureGridLayout(int columns)
     {
-        // Tamaño reducido para que quepan bien en pantalla
         float tileSize = 75f;
         float spacing = 5f;
 
@@ -123,23 +109,21 @@ public class Tile_Grid : MonoBehaviour
         gridLayoutGroup.constraintCount = columns;
     }
 
-    // ── INPUT DEL JUGADOR ─────────────────────────────────────────────────
 
-    // Agrega una letra al tile actual de la fila en curso
     public void EnterLetter(char letter)
     {
-        // No hacemos nada si la grilla todavía no está inicializada
+
         if (tiles == null) return;
 
-        // No agregamos más letras si la fila ya está completa
+
         if (currentColumn >= wordLength) return;
 
-        // Asignamos la letra al tile correspondiente
+
         tiles[currentRow, currentColumn].SetLetter(letter);
         currentColumn++;
     }
 
-    // Borra la última letra ingresada
+
     public void DeleteLetter()
     {
         if (tiles == null) return;
@@ -149,8 +133,7 @@ public class Tile_Grid : MonoBehaviour
         tiles[currentRow, currentColumn].ClearLetter();
     }
 
-    // Evalúa la fila actual cuando el jugador presiona Enter/Confirmar
-    // Retorna true si ganó, false en los demás casos
+
     public bool SubmitRow()
     {
         if (tiles == null) return false;
@@ -162,30 +145,30 @@ public class Tile_Grid : MonoBehaviour
             return false;
         }
 
-        // Construimos la palabra ingresada leyendo los tiles de la fila
+
         string guess = "";
         for (int col = 0; col < wordLength; col++)
             guess += tiles[currentRow, col].GetLetter();
 
         guess = guess.ToUpper();
 
-        // Evaluamos letra por letra y pintamos los tiles con colores
+
         EvaluateRow(guess);
 
         int attemptsUsed = currentRow + 1;
 
-        // ¿El jugador acertó la palabra completa?
+
         if (guess == secretWord)
         {
             Game_Manager.Instance.OnVictory(attemptsUsed);
             return true;
         }
 
-        // Avanzamos a la siguiente fila
+
         currentRow++;
         currentColumn = 0;
 
-        // ¿Se agotaron los intentos?
+
         if (currentRow >= maxAttempts)
         {
             Game_Manager.Instance.OnDefeat(attemptsUsed);
@@ -195,7 +178,7 @@ public class Tile_Grid : MonoBehaviour
         return false;
     }
 
-    // Evalúa cada letra del guess contra la palabra secreta y pinta los tiles
+
     private void EvaluateRow(string guess)
     {
         char[] secretChars = secretWord.ToCharArray();
@@ -203,7 +186,7 @@ public class Tile_Grid : MonoBehaviour
         bool[] guessUsed = new bool[wordLength];
         TileResult[] results = new TileResult[wordLength];
 
-        // PRIMERA PASADA: letras en posición exacta → verde
+        
         for (int col = 0; col < wordLength; col++)
         {
             if (guess[col] == secretChars[col])
@@ -214,12 +197,12 @@ public class Tile_Grid : MonoBehaviour
             }
         }
 
-        // SEGUNDA PASADA: letras presentes en otra posición → amarillo
+        
         for (int col = 0; col < wordLength; col++)
         {
             if (guessUsed[col]) continue;
 
-            results[col] = TileResult.Absent; // por defecto gris
+            results[col] = TileResult.Absent; 
 
             for (int s = 0; s < wordLength; s++)
             {
@@ -232,15 +215,13 @@ public class Tile_Grid : MonoBehaviour
             }
         }
 
-        // Pintamos cada tile Y cada tecla del teclado con su color
+        
         for (int col = 0; col < wordLength; col++)
         {
-            // Pintamos el tile de la grilla
+            
             tiles[currentRow, col].SetResult(results[col]);
 
-            // Pintamos la tecla correspondiente en el teclado virtual
-            // La prioridad es: Correct > Present > Absent
-            // Si la tecla ya es verde, no la pisamos con amarillo o gris
+            
             char letra = guess[col];
             Game_Manager.Instance.keyboardController.UpdateKeyColor(letra, results[col]);
         }
